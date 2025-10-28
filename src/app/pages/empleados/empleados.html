@@ -1,1 +1,98 @@
-<p>empleados works!</p>
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold">Empleados</h2>
+      <button z-button zType="default" (click)="openCreateDialog()">
+        <z-icon zType="folder-plus" class="mr-2" />
+        Nuevo Empleado
+      </button>
+    </div>
+  
+    <z-divider></z-divider>
+  
+    @if (loading()) {
+    <div class="flex items-center justify-center py-12">
+      <z-icon zType="loader-circle" class="animate-spin" />
+      <span class="ml-2">Cargando empleados...</span>
+    </div>
+    } @else if (error()) {
+    <div class="flex items-center justify-center py-12 text-destructive">
+      <z-icon zType="circle-x" class="mr-2" />
+      {{ error() }}
+    </div>
+    } @else {
+    <div class="w-full overflow-hidden rounded-md border">
+      <table z-table>
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head class="w-20">ID</th>
+            <th z-table-head>Nombre</th>
+            <th z-table-head>Apellido</th>
+            <th z-table-head>Correo</th>
+            <th z-table-head>Salario</th>
+            <th z-table-head>Creacion</th>
+            <th z-table-head class="w-32 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @for (empleado of empleados(); track empleado.id) {
+          <tr z-table-row>
+            <td z-table-cell>
+              <div class="font-medium">#{{ empleado.id }}</div>
+            </td>
+            <td z-table-cell>
+              <div class="font-medium">{{ empleado.nombre }}</div>
+            </td>
+            <td z-table-cell>
+                <div class="font-medium">{{ empleado.apellido }}</div>
+              </td>
+              <td z-table-cell>
+                <div class="font-medium">{{ empleado.correo }}</div>
+              </td>
+              <td z-table-cell>
+                <div class="font-medium">{{ formatPrice(empleado.salario) }}</div>
+              </td>
+            <td z-table-cell>
+              <div class="text-sm text-muted-foreground">
+                {{ formatDate(empleado.created_at) }}
+              </div>
+            </td>
+            <td z-table-cell>
+              <div class="flex items-center justify-end gap-2">
+                <button
+                  z-button
+                  zType="ghost"
+                  zSize="icon"
+                  (click)="openEditDialog(empleado)"
+                  title="Editar empleado"
+                >
+                  <z-icon zType="square-pen" />
+                </button>
+                <button
+                  z-button
+                  zType="ghost"
+                  zSize="icon"
+                  (click)="deleteEmpleado(empleado)"
+                  title="Eliminar empleado"
+                  class="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <z-icon zType="trash2" />
+                </button>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr z-table-row>
+            <td z-table-cell [attr.colspan]="5" class="h-24 text-center">
+              <div class="flex flex-col items-center gap-2">
+                <z-icon zType="folder-open" class="text-muted-foreground" />
+                <span class="text-muted-foreground">No hay empleados registrados</span>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+  
