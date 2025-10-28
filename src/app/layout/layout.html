@@ -1,0 +1,145 @@
+<z-layout class="border rounded-md overflow-hidden h-screen">
+  <!-- Overlay para móvil -->
+  @if (isMobile() && mobileMenuOpen()) {
+  <div class="fixed inset-0 bg-black/50 z-40 md:hidden" (click)="closeMobileMenu()"></div>
+  }
+
+  <!-- Sidebar -->
+  <z-sidebar
+    [zWidth]="250"
+    [zCollapsible]="!isMobile()"
+    [zCollapsed]="sidebarCollapsed()"
+    [zCollapsedWidth]="70"
+    (zCollapsedChange)="onCollapsedChange($event)"
+    [class]="
+      'p-0! transition-transform duration-300 ' +
+      (isMobile()
+        ? 'fixed left-0 top-0 bottom-0 z-50 ' +
+          (mobileMenuOpen() ? 'translate-x-0' : '-translate-x-full')
+        : 'relative')
+    "
+  >
+    <nav
+      [class]="
+        'flex flex-col h-full overflow-hidden bg-sidebar ' +
+        (sidebarCollapsed() && !isMobile() ? 'gap-1 p-1 pt-4' : 'gap-4 p-4')
+      "
+    >
+      <!-- Header del sidebar en móvil -->
+      @if (isMobile()) {
+      <div class="flex items-center justify-between pb-4 border-b border-sidebar-border">
+        <span class="font-semibold text-lg">Menu</span>
+        <button z-button zType="ghost" zSize="sm" (click)="closeMobileMenu()">
+          <z-icon zType="x" />
+        </button>
+      </div>
+      }
+
+      <z-sidebar-group>
+        @if (!sidebarCollapsed() || isMobile()) {
+        <z-sidebar-group-label>Main</z-sidebar-group-label>
+        } @for (item of mainMenuItems; track item.label) {
+        <button
+          [routerLink]="item.route"
+          routerLinkActive="bg-accent"
+          z-button
+          zType="ghost"
+          [class]="sidebarCollapsed() && !isMobile() ? 'justify-center' : 'justify-start'"
+          [zTooltip]="sidebarCollapsed() && !isMobile() ? item.label : ''"
+          zPosition="right"
+          (click)="closeMobileMenu()"
+        >
+          <z-icon
+            [zType]="item.icon"
+            [class]="sidebarCollapsed() && !isMobile() ? '' : ' mr-2'"
+          ></z-icon>
+          @if (!sidebarCollapsed() || isMobile()) {
+          <span>{{ item.label }}</span>
+          }
+        </button>
+        }
+      </z-sidebar-group>
+
+      <div class="mt-auto">
+        <div
+          z-menu
+          [zMenuTriggerFor]="userMenu"
+          zPlacement="rightBottom"
+          [class]="
+            'flex items-center justify-center gap-2 cursor-pointer rounded-md hover:bg-accent ' +
+            (sidebarCollapsed() && !isMobile() ? 'p-0 m-2' : 'p-2')
+          "
+        >
+          <z-avatar zSize="sm" [zImage]="avatar" />
+
+          @if (!sidebarCollapsed() || isMobile()) {
+          <div>
+            <span class="font-medium">Fer</span>
+            <div class="text-xs">ferpa&#64;gmail.com</div>
+          </div>
+
+          <z-icon zType="chevrons-up-down" class="ml-auto" />
+          }
+        </div>
+
+        <ng-template #userMenu>
+          <div z-menu-content class="w-48">
+            <button z-menu-item>
+              <z-icon zType="user" class="mr-2" />
+              Profile
+            </button>
+            <button z-menu-item>
+              <z-icon zType="settings" class="mr-2" />
+              Settings
+            </button>
+            <button
+              z-menu-item
+              type="button"
+              (click)="$event.stopPropagation(); toggleTheme()"
+              style="cursor: pointer"
+            >
+              <z-icon [zType]="getCurrentTheme() === 'dark' ? 'sun' : 'moon'" class="mr-2" />
+              {{ getCurrentTheme() === 'dark' ? 'Light' : 'Dark' }}
+            </button>
+
+            <z-divider zSpacing="sm" />
+            <button z-menu-item>
+              <z-icon zType="log-out" class="mr-2" />
+              Logout
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </nav>
+  </z-sidebar>
+
+  <!-- Content Area -->
+  <z-content class="min-h-[200px] w-full">
+    <!-- Header con botón hamburguesa -->
+    <div class="flex items-center mb-4">
+      <button z-button zType="ghost" zSize="sm" class="-ml-2" (click)="toggleSidebar()">
+        <z-icon [zType]="isMobile() ? 'menu' : 'panel-left'" />
+      </button>
+
+      <z-divider zOrientation="vertical" class="h-4 ml-2" />
+
+      <!-- Breadcrumb - oculto en móvil pequeño -->
+      <z-breadcrumb class="hidden sm:block">
+        <z-breadcrumb-list zWrap="wrap" zAlign="start">
+          <z-breadcrumb-item>
+            <z-breadcrumb-link zLink="/">Home</z-breadcrumb-link>
+          </z-breadcrumb-item>
+          <z-breadcrumb-separator />
+          <z-breadcrumb-item>
+            <z-breadcrumb-link zLink="/dashboard">Dashboard</z-breadcrumb-link>
+          </z-breadcrumb-item>
+        </z-breadcrumb-list>
+      </z-breadcrumb>
+    </div>
+
+    <!-- Contenido de las páginas -->
+    <div class="p-2 md:p-4">
+      <router-outlet></router-outlet>
+    </div>
+  </z-content>
+</z-layout>
